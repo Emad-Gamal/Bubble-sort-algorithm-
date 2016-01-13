@@ -1,0 +1,53 @@
+#include <iregdef.h>
+.data
+	arrayOne: .word 2,3,0,7,8
+	arrSize: .word 5
+	
+.text
+.global start
+.ent start
+start:
+	la t0, arrayOne //load the address of the array to register t0.
+	lw t1, arrSize 	//load the size of the array ( word ) to register t1.
+	lw t3, (t0) //load the first element of the array to register t3 as the max. value.  
+	//*****************Min******************//
+	lw t5, (t0) //load the first element of the array to register t5 as the min. value.
+	
+	startOfTheLoop: //loop starts here.
+		lw t4, (t0) //Once again, load the first element in the array to a register "t4" for comparing and traversing the array.
+		
+		//bge t4, t3, goToGreaterThan //Check if t4 is greater than or equal to t3. If so, we go to "goToGreaterThan" lable and update
+									//the value of t3 to be t4 "t3=t4". 
+		
+		slt s0,t3,t4
+		beq t3,t4,goToGreaterThan
+		beq s0,1,goToGreaterThan
+									
+		//blt t4, t5, goToLessThan	//If it's not greater than we leave every thing as it is and just travesring the next element of the 
+									//array by going to "goToLessThan" lable.
+									
+		slt s1,t4,t5
+		beq s1,1,goToLessThan
+									
+		add t0, t0, 4
+		j startOfTheLoop			//If the two conditions failed go to start of the loop.
+		
+		
+		goToGreaterThan:
+			add t3, zero, t4  		//t3=t4.
+			
+			sub t1, t1, 1   		//decrement the counter that traversing the array by one.
+			add t0, t0, 4			//increment t0 by four to go to the next word in the array of words.
+			bne t1, zero, startOfTheLoop	//If the counter didn't reach Zero, which means that there still more elements in the array 
+											//we go to the first of the loop and do it all again.
+			j End
+		goToLessThan:		
+			add t5, zero, t4     //t5=t4.
+			
+			sub t1, t1, 1
+			add t0, t0, 4
+			bne t1, zero, startOfTheLoop
+			j End
+		End:
+			
+Jal _exit
